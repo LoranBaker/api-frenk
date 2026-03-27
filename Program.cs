@@ -156,12 +156,8 @@ using (var scope = app.Services.CreateScope())
     await settings.RefreshAsync();
 }
 
-// ── Middleware pipeline ───────────────────────────────────
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseMiddleware<Frank.API.Middleware.ErrorHandlingMiddleware>();
 // app.UseHttpsRedirection();
