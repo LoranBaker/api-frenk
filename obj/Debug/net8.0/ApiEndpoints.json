@@ -1,0 +1,360 @@
+[
+  {
+    "ContainingType": "FrankApi.API.Controllers.AccountController",
+    "Method": "Delete",
+    "RelativePath": "api/account",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.AccountController",
+    "Method": "Export",
+    "RelativePath": "api/account/export",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.AuthController",
+    "Method": "Register",
+    "RelativePath": "api/auth/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.RegisterRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.EveningController",
+    "Method": "Submit",
+    "RelativePath": "api/checkins/evening",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.EveningCheckinRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.EveningController",
+    "Method": "GetStatus",
+    "RelativePath": "api/checkins/evening/today",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.MorningController",
+    "Method": "Submit",
+    "RelativePath": "api/checkins/morning",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.MorningCheckinRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.MorningController",
+    "Method": "GetStatus",
+    "RelativePath": "api/checkins/morning/today",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.HistoryController",
+    "Method": "GetDay",
+    "RelativePath": "api/history/day/{date}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "date",
+        "Type": "System.DateOnly",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.HistoryController",
+    "Method": "GetWeeks",
+    "RelativePath": "api/history/weeks",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.MiniMirrorController",
+    "Method": "Get",
+    "RelativePath": "api/mini-mirror",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.MiniMirrorController",
+    "Method": "GetShown",
+    "RelativePath": "api/mini-mirror/shown",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.NotificationsController",
+    "Method": "SaveToken",
+    "RelativePath": "api/notifications/device-token",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "FrankApi.API.Controllers.DeviceTokenRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.NotificationsController",
+    "Method": "SendScheduled",
+    "RelativePath": "api/notifications/send-scheduled",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "X-Cron-Secret",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.OnboardingController",
+    "Method": "Save",
+    "RelativePath": "api/onboarding",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.OnboardingRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.OnboardingController",
+    "Method": "GetProfile",
+    "RelativePath": "api/onboarding/profile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.QuestionsController",
+    "Method": "GetHalt",
+    "RelativePath": "api/questions/halt",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.QuestionsController",
+    "Method": "GetMorningPair",
+    "RelativePath": "api/questions/morning",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.QuestionsController",
+    "Method": "GetOnboarding",
+    "RelativePath": "api/questions/onboarding",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.QuestionsController",
+    "Method": "GetAllTapOptions",
+    "RelativePath": "api/questions/tap-options",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.QuestionsController",
+    "Method": "GetUrgeQuestions",
+    "RelativePath": "api/questions/urge",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "addictionType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "intensity",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "haltRoot",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.UrgeController",
+    "Method": "SavePostMood",
+    "RelativePath": "api/urge/post-mood",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.PostUrgeMoodRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.UrgeController",
+    "Method": "Resolve",
+    "RelativePath": "api/urge/resolve",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.ResolveUrgeRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.UrgeController",
+    "Method": "Start",
+    "RelativePath": "api/urge/start",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.StartUrgeRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.UrgeController",
+    "Method": "GetTodayCount",
+    "RelativePath": "api/urge/today-count",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.WeeklyController",
+    "Method": "GetMirror",
+    "RelativePath": "api/weekly/mirror",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FrankApi.API.Controllers.WeeklyController",
+    "Method": "SaveReflection",
+    "RelativePath": "api/weekly/reflection",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Frank.Application.DTOs.Requests.WeeklyReflectionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
