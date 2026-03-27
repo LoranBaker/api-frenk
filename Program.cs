@@ -141,7 +141,8 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "http://localhost:8081",  // Expo dev
                 "http://localhost:3000",
-                "https://localhost:7199")  // local web
+                "https://localhost:7199",
+                "https://api-frenk-production.up.railway.app")  // local web
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
@@ -163,13 +164,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<Frank.API.Middleware.ErrorHandlingMiddleware>();
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("FrankApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+app.Run($"http://0.0.0.0:{port}");
 
 // ── Placeholder services ──────────────────────────────────
 
