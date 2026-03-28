@@ -160,7 +160,6 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseMiddleware<Frank.API.Middleware.ErrorHandlingMiddleware>();
-// app.UseHttpsRedirection();
 app.UseCors("FrankApp");
 app.UseAuthentication();
 app.UseAuthorization();
