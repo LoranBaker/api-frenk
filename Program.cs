@@ -149,11 +149,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ── Seed AppSettings on startup ───────────────────────────
 using (var scope = app.Services.CreateScope())
 {
-    var settings = scope.ServiceProvider.GetRequiredService<IAppSettingsService>();
-    await settings.RefreshAsync();
+    try
+    {
+        var settings = scope.ServiceProvider.GetRequiredService<IAppSettingsService>();
+        await settings.RefreshAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning("AppSettings refresh failed on startup: {Message}", ex.Message);
+    }
 }
 
 app.UseSwagger();
