@@ -165,11 +165,11 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseMiddleware<Frank.API.Middleware.ErrorHandlingMiddleware>();
 app.UseCors("FrankApp");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRouting();  // ← ADD THIS LINE
 app.MapControllers();
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
