@@ -52,7 +52,8 @@ public class MiniMirrorController : FrankBaseController
         {
             quotes = quotes,
             observation = evt.Observation,
-            urgeCount = evt.UrgeCount
+            urgeCount = evt.UrgeCount,
+            triggeredAt = evt.TriggeredAt.ToString("yyyy-MM-dd")  // ← date string only, no time
         });
     }
 }
