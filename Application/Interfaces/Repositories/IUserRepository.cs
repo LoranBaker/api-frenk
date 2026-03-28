@@ -9,4 +9,5 @@ public interface IUserRepository : IRepository<UserProfile>
     Task UpsertAsync(UserProfile profile, CancellationToken ct = default);
 
     Task DeleteAsync(Guid userId, CancellationToken ct = default);
+
 }

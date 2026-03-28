@@ -8,6 +8,8 @@ namespace Frank.Application.Services;
 /// Loads all app_settings from DB at startup.
 /// Cached in memory. Refreshed every 5 minutes.
 /// Nothing user-facing is hardcoded — everything comes from here.
+/// Numeric thresholds (resist rates, intensity gates) also live here
+/// so they can be tuned without a code deploy.
 /// </summary>
 public class AppSettingsService : IAppSettingsService
 {
@@ -36,7 +38,6 @@ public class AppSettingsService : IAppSettingsService
         {
             if (!ShouldRefresh()) return;
 
-            // Create a scope to resolve the scoped repository
             using var scope = _scopeFactory.CreateScope();
             var repo = scope.ServiceProvider
                 .GetRequiredService<IAppSettingRepository>();
@@ -62,11 +63,36 @@ public class AppSettingsService : IAppSettingsService
     private bool ShouldRefresh()
         => DateTime.UtcNow - _lastRefresh >
            TimeSpan.FromMinutes(RefreshIntervalMinutes);
+
+    // ── Core getters ──────────────────────────────────────
+
     public string Get(string key, string fallback = "")
+        => _cache.TryGetValue(key, out var value) ? value : fallback;
+
+    // FIX 5: Numeric getter for configurable thresholds.
+    // Intervention routing thresholds (resist rate gates, intensity gates)
+    // live in app_settings so they're tunable without a code deploy.
+    //
+    // Seed these rows in app_settings:
+    //   urge_low_resist_threshold  = 0.30
+    //   urge_mid_resist_threshold  = 0.50
+    //
+    // To tune: UPDATE app_settings SET value='0.25' WHERE key='urge_low_resist_threshold'
+    // Live immediately — no restart, no deploy.
+    public double GetDouble(string key, double fallback = 0.0)
     {
-        return _cache.TryGetValue(key, out var value)
-            ? value
-            : fallback;
+        if (_cache.TryGetValue(key, out var raw) &&
+            double.TryParse(raw, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var parsed))
+        {
+            return parsed;
+        }
+
+        _logger.LogWarning(
+            "AppSetting '{Key}' not found or not parseable as double. Using fallback {Fallback}.",
+            key, fallback);
+
+        return fallback;
     }
 
     // ── Crisis ────────────────────────────────────────────
@@ -131,8 +157,4 @@ public class AppSettingsService : IAppSettingsService
 
         return Get(key, "Frank is ready when you are.");
     }
-
-    // ── Refresh ───────────────────────────────────────────
-
-
 }

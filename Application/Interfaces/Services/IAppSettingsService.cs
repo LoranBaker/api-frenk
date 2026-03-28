@@ -39,6 +39,7 @@ public interface IAppSettingsService
     // ── Fallbacks ─────────────────────────────────────────
     string GetMorningForecastFallback();
     string GetWeeklyMirrorFallback();
+    double GetDouble(string key, double fallback = 0.0);
 
     // ── Notification texts ────────────────────────────────
     string GetNotificationText(string type);

@@ -37,4 +37,13 @@ public interface IUrgeRepository : IRepository<UrgeEvent>
 
     Task DeleteAllByUserAsync(Guid userId, CancellationToken ct = default);
 
+
+    Task<List<UrgeEvent>> GetRecentByUserAsync(
+    Guid userId, CancellationToken ct = default);
+
+    Task<List<string>> GetRecentInterventionIdsAsync(
+    Guid userId,
+    int count,
+    CancellationToken ct = default);
+
 }

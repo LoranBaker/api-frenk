@@ -1,4 +1,6 @@
-﻿namespace Frank.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Frank.Domain.Entities;
 
 /// <summary>
 /// All questions live in this table. Zero hardcoded in frontend or backend code.
@@ -49,6 +51,10 @@ public class Question
     /// InterventionService reads these to route based on pattern not raw answer.
     /// </summary>
     public string[] PatternTags { get; set; } = Array.Empty<string>();
+
+    [Column("subtype")]
+    public string? Subtype { get; set; }
+
 
     // ── Navigation ────────────────────────────────────────
     public ICollection<TapOption> TapOptions { get; set; } = new List<TapOption>();

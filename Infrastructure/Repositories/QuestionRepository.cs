@@ -63,15 +63,26 @@ public class QuestionRepository : IQuestionRepository
         .ToListAsync(ct);
 
     public async Task<List<Question>> GetBySessionTypeAsync(
-        string sessionType,
-        CancellationToken ct = default)
-        => await _db.Questions
+    string sessionType,
+    CancellationToken ct = default)
+    {
+        var query = _db.Questions
             .Include(q => q.TapOptions.Where(t => t.Active))
             .Where(q => q.SessionType == sessionType
                      && q.Active
-                     && q.Phase == "mvp")
+                     && q.Phase == "mvp");
+
+        // Halt has two subtypes:
+        //   screening    → H01-H05, shown to user in the urge HALT flow
+        //   intervention → H01B-HX4, served by GetByHaltRootAsync after root detected
+        // This endpoint must only ever return the 5 screening questions.
+        if (sessionType == "halt")
+            query = query.Where(q => q.Subtype == "screening");
+
+        return await query
             .OrderBy(q => q.Id)
             .ToListAsync(ct);
+    }
 
     public async Task<List<QuestionSelectionRule>> GetSelectionRulesAsync(
         string sessionType,
@@ -98,6 +109,14 @@ public class QuestionRepository : IQuestionRepository
 
         await _db.SaveChangesAsync(ct);
     }
+    public async Task<List<Question>> GetByHaltRootAsync(
+     string haltRoot, CancellationToken ct = default)
+     => await _db.Questions
+         .Where(q => q.SessionType == "urge"
+                  && q.Active
+                  && q.Phase == "mvp"
+                  && q.PatternTags.Contains(haltRoot))
+         .ToListAsync(ct);
 }
 
 public class AppSettingRepository : IAppSettingRepository
@@ -155,4 +174,6 @@ public class TapOptionRepository : ITapOptionRepository
             .Where(t => questionIds.Contains(t.QuestionId) && t.Active)
             .OrderBy(t => t.Order)
             .ToListAsync(ct);
+
+ 
 }

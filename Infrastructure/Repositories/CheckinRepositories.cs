@@ -76,6 +76,25 @@ public class UrgeRepository : BaseRepository<UrgeEvent>, IUrgeRepository
                           && e.Timestamp < end, ct);
     }
 
+    public async Task<List<string>> GetRecentInterventionIdsAsync(
+    Guid userId,
+    int count,
+    CancellationToken ct = default)
+    {
+        var todayStart = DateTime.UtcNow.Date;
+        var todayEnd = todayStart.AddDays(1);
+
+        return await _db.UrgeEvents
+            .Where(e => e.UserId == userId
+                     && e.Timestamp >= todayStart
+                     && e.Timestamp < todayEnd
+                     && e.InterventionId != null)
+            .OrderByDescending(e => e.Timestamp)
+            .Take(count)
+            .Select(e => e.InterventionId!)
+            .ToListAsync(ct);
+    }
+
     public async Task<List<UrgeEvent>> GetThisWeekAsync(
         Guid userId, DateOnly weekStart, CancellationToken ct = default)
     {
@@ -172,6 +191,14 @@ public class UrgeRepository : BaseRepository<UrgeEvent>, IUrgeRepository
         _db.UrgeEvents.RemoveRange(rows);
         await _db.SaveChangesAsync(ct);
     }
+
+    public async Task<List<UrgeEvent>> GetRecentByUserAsync(
+    Guid userId, CancellationToken ct = default)
+    => await _db.UrgeEvents
+        .Where(e => e.UserId == userId)
+        .OrderByDescending(e => e.Timestamp)
+        .Take(10)
+        .ToListAsync(ct);
 }
 
 public class EveningRepository : BaseRepository<EveningCheckin>, IEveningRepository

@@ -22,7 +22,6 @@ public class UrgeService : IUrgeService
     private readonly IAppSettingsService _settings;
     private readonly ILogger<UrgeService> _logger;
 
-    // Max urge presses per day — enforced here
     private const int MaxUrgesPerDay = 20;
 
     public UrgeService(
@@ -54,10 +53,10 @@ public class UrgeService : IUrgeService
     }
 
     public async Task<StartUrgeResponse> StartAsync(
-    Guid userId,
-    StartUrgeRequest request,
-    DateOnly localDate,
-    CancellationToken ct = default)
+        Guid userId,
+        StartUrgeRequest request,
+        DateOnly localDate,
+        CancellationToken ct = default)
     {
         // 1. Rate limit using localDate
         var todayCount = await _urge.GetTodayCountAsync(userId, localDate, ct);
@@ -83,8 +82,7 @@ public class UrgeService : IUrgeService
         var haltRoot = DetermineHaltRoot(request.HaltAnswers);
 
         // 6. Create chat session using localDate
-        var session = await _sessions.CreateAsync(
-            userId, "urge", localDate, ct);
+        var session = await _sessions.CreateAsync(userId, "urge", localDate, ct);
 
         // 7. Save HALT answers
         if (request.HaltAnswers.Any())
@@ -104,6 +102,13 @@ public class UrgeService : IUrgeService
         }
 
         // 8. Build intervention context
+        // FIX 7: Use local hour from the request timezone offset so midnight_regret
+        // fires at actual local midnight, not UTC midnight. TimezoneOffsetHours is
+        // sent by the frontend (device local offset in whole hours, e.g. +2 for CEST).
+        // Guard: clamp offset to ±14 before applying.
+        var clampedOffset = Math.Clamp(request.TimezoneOffsetHours, -14, 14);
+        var localHour = ((DateTime.UtcNow.Hour + clampedOffset) % 24 + 24) % 24;
+
         var context = new InterventionContext(
             UserId: userId,
             AddictionType: request.AddictionType,
@@ -115,7 +120,7 @@ public class UrgeService : IUrgeService
             IdentityFraming: profile.IdentityFraming,
             SlippedToday: slippedToday,
             ResistRateThisWeek: resistRate,
-            HourOfDay: DateTime.UtcNow.Hour
+            HourOfDay: localHour   // ← local hour, not UTC
         );
 
         // 9. Select intervention
@@ -142,12 +147,11 @@ public class UrgeService : IUrgeService
         await _urge.SaveChangesAsync(ct);
 
         // 11. Write conversation history
-        await WriteUrgeStartHistoryAsync(
-            userId, session.Id, request, intervention, ct);
+        await WriteUrgeStartHistoryAsync(userId, session.Id, request, intervention, ct);
 
         _logger.LogInformation(
-            "Urge started for user {UserId}. Addiction={Addiction} Intensity={Intensity}",
-            userId, request.AddictionType, request.UrgeIntensity);
+            "Urge started for user {UserId}. Addiction={Addiction} Intensity={Intensity} LocalHour={Hour}",
+            userId, request.AddictionType, request.UrgeIntensity, localHour);
 
         return new StartUrgeResponse(
             UrgeEventId: urgeEvent.Id,
@@ -173,7 +177,7 @@ public class UrgeService : IUrgeService
             }
         }
 
-        // 2. Save pre_urge_context to answers
+        // 2. Save pre_urge_context to answers table
         if (!string.IsNullOrEmpty(request.PreUrgeContextTap))
         {
             var urgeEvent = await _urge.GetByIdAsync(request.UrgeEventId, ct);
@@ -181,18 +185,18 @@ public class UrgeService : IUrgeService
             {
                 await _answers.AddRangeAsync(new[]
                 {
-                new Answer
-                {
-                    Id           = Guid.NewGuid(),
-                    UserId       = userId,
-                    SessionId    = urgeEvent.SessionId,
-                    SessionType  = "urge",
-                    QuestionId   = "U01",
-                    QuestionText = "Just before this — what was happening?",
-                    TapValue     = request.PreUrgeContextTap,
-                    Timestamp    = DateTime.UtcNow
-                }
-            }, ct);
+                    new Answer
+                    {
+                        Id           = Guid.NewGuid(),
+                        UserId       = userId,
+                        SessionId    = urgeEvent.SessionId,
+                        SessionType  = "urge",
+                        QuestionId   = "U01",
+                        QuestionText = "Just before this — what was happening?",
+                        TapValue     = request.PreUrgeContextTap,
+                        Timestamp    = DateTime.UtcNow
+                    }
+                }, ct);
             }
         }
 
@@ -234,17 +238,14 @@ public class UrgeService : IUrgeService
         PostUrgeMoodRequest request,
         CancellationToken ct = default)
     {
-        // Crisis check on free text
         if (!string.IsNullOrEmpty(request.WhatWasThat) &&
             _crisis.ContainsCrisisKeywords(request.WhatWasThat))
         {
             await _crisis.LogCrisisEventAsync(userId, "urge", ct);
         }
 
-        await _urge.UpdatePostMoodAsync(
-            request.UrgeEventId, request.Mood, ct);
+        await _urge.UpdatePostMoodAsync(request.UrgeEventId, request.Mood, ct);
 
-        // Save what_was_that if provided (Frame 1 collection)
         if (!string.IsNullOrEmpty(request.WhatWasThat))
         {
             var urgeEvent = await _urge.GetByIdAsync(request.UrgeEventId, ct);
@@ -268,8 +269,7 @@ public class UrgeService : IUrgeService
         }
 
         _logger.LogInformation(
-            "Post-urge mood saved for user {UserId}. Mood={Mood}",
-            userId, request.Mood);
+            "Post-urge mood saved for user {UserId}. Mood={Mood}", userId, request.Mood);
 
         return new SuccessResponse();
     }
@@ -284,39 +284,26 @@ public class UrgeService : IUrgeService
 
             switch (answer.QuestionId)
             {
-                // H01 — Hungry: snacks or nothing = triggered
                 case "H01":
-                    if (value is "eaten_snacks" or "not_eaten")
-                        return "hungry";
+                    if (value == "not_eaten") return "hungry";
                     break;
-
-                // H02 — Angry: any frustration = triggered
                 case "H02":
-                    if (value is "mild_frustration" or "properly_angry")
-                        return "angry";
+                    if (value == "properly_angry") return "angry";
                     break;
-
-                // H03 — Lonely: any isolation = triggered
                 case "H03":
-                    if (value is "mildly_isolated" or "very_lonely")
-                        return "lonely";
+                    if (value == "very_lonely") return "lonely";
                     break;
-
-                // H04 — Tired: running low or exhausted = triggered
                 case "H04":
-                    if (value is "running_low" or "exhausted")
-                        return "tired";
+                    if (value == "exhausted") return "tired";
                     break;
-
-                // H05 — Stressed: any stress = triggered
                 case "H05":
-                    if (value is "mildly_stressed" or "very_stressed")
-                        return "stressed";
+                    if (value == "very_stressed") return "stressed";
                     break;
             }
         }
         return null;
     }
+
     private static DateOnly GetMondayOfWeek(DateOnly date)
     {
         var diff = (int)date.DayOfWeek - (int)DayOfWeek.Monday;
@@ -336,7 +323,6 @@ public class UrgeService : IUrgeService
 
         var messages = new List<ConversationHistory>
         {
-            // User selected addiction
             new()
             {
                 Id          = Guid.NewGuid(),
@@ -351,7 +337,6 @@ public class UrgeService : IUrgeService
                 TapValue    = request.AddictionType,
                 CreatedAt   = now
             },
-            // User emotion tap
             new()
             {
                 Id          = Guid.NewGuid(),
@@ -366,7 +351,6 @@ public class UrgeService : IUrgeService
                 TapValue    = request.EmotionTap,
                 CreatedAt   = now
             },
-            // Intensity
             new()
             {
                 Id          = Guid.NewGuid(),
@@ -381,7 +365,6 @@ public class UrgeService : IUrgeService
                 TapValue    = request.UrgeIntensity.ToString(),
                 CreatedAt   = now
             },
-            // Frank intervention
             new()
             {
                 Id          = Guid.NewGuid(),
@@ -411,9 +394,9 @@ public class UrgeService : IUrgeService
 
         var now = DateTime.UtcNow;
         var today = DateOnly.FromDateTime(now);
+
         var messages = new List<ConversationHistory>
         {
-            // Result badge
             new()
             {
                 Id          = Guid.NewGuid(),
@@ -430,7 +413,6 @@ public class UrgeService : IUrgeService
             }
         };
 
-        // Counter message if applicable
         var counterMessage = _settings.GetCounterMessage(dailyCount);
         if (counterMessage is not null)
         {
@@ -451,5 +433,4 @@ public class UrgeService : IUrgeService
 
         await _conversation.AddRangeAsync(messages, ct);
     }
-
 }

@@ -103,11 +103,14 @@ public class QuestionService : IQuestionService
         string? haltRoot,
         CancellationToken ct = default)
     {
-        // Determine frame based on intensity
+        // FIX 1 (mirrored from InterventionService):
+        // High (8-10) = frame2 — heavy interrupt, no deep reflection.
+        // Medium (4-7) = frame1 — reflective questions appropriate.
+        // Low  (1-3)  = frame1 — full prefrontal capacity.
         var frame = intensity switch
         {
             >= 8 => "frame2",
-            >= 4 => "frame2",
+            >= 4 => "frame1",   // was frame2 — wrong
             _ => "frame1"
         };
 
@@ -118,7 +121,7 @@ public class QuestionService : IQuestionService
             cooldownDays: 0,
             ct: ct);
 
-        // Filter further by addiction type via pattern_tags if available
+        // Filter by addiction type via pattern_tags where available
         var filtered = questions
             .Where(q => q.PatternTags.Length == 0 ||
                         q.PatternTags.Contains(addictionType) ||
@@ -205,8 +208,6 @@ public class QuestionService : IQuestionService
                 Frame: q.Frame,
                 TapOptions: qOptions);
         }).ToArray();
-
-
     }
 
     public async Task<TapOptionsMapResponse> GetAllTapOptionsAsync(CancellationToken ct = default)

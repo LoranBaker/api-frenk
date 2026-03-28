@@ -39,4 +39,7 @@ public interface IQuestionRepository
     Task<List<Question>> GetByTagAsync(
         string tag,
         CancellationToken ct = default);
+
+    Task<List<Question>> GetByHaltRootAsync(string haltRoot, CancellationToken ct = default);
+
 }

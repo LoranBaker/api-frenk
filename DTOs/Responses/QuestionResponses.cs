@@ -25,6 +25,7 @@ public record TapOptionMapItem(string Value, string Text);
 public record TapOptionsMapResponse(TapOptionMapItem[] Options);
 
 
+
 public record UserProfileResponse(
     Guid UserId,
     string FirstName,

@@ -74,6 +74,8 @@ public class AppDbContext : DbContext
             e.Property(x => x.Frame).HasColumnName("frame");
             e.Property(x => x.PatternTags).HasColumnName("pattern_tags")
                 .HasColumnType("text[]");
+            e.Property(q => q.Subtype).HasMaxLength(50);
+
         });
 
         // ── TapOption ─────────────────────────────────────
