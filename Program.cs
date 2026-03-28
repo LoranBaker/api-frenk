@@ -162,12 +162,13 @@ using (var scope = app.Services.CreateScope())
         logger.LogWarning("AppSettings refresh failed on startup: {Message}", ex.Message);
     }
 }
+app.UseRouting();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseMiddleware<Frank.API.Middleware.ErrorHandlingMiddleware>();
-app.UseRouting();
+
 app.UseCors("FrankApp");
 app.UseAuthentication();
 app.UseAuthorization();
