@@ -1,5 +1,3 @@
-REST API for Frank — a CBT-inspired daily companion app. Built with .NET/C#, PostgreSQL (Supabase), and Claude AI integration.
-
 .NET/C# REST API powering the Frank daily companion app. Handles all business logic, data persistence, and AI integration for a habit and urge management system built around CBT-inspired pattern awareness.
 What it does:
 
